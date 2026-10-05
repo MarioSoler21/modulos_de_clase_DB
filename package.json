@@ -1,0 +1,33 @@
+{
+  "name": "modulos-de-clase-donbosco",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --use-system-ca node_modules/next/dist/bin/next dev",
+    "build": "next build",
+    "start": "node --use-system-ca node_modules/next/dist/bin/next start",
+    "seed:storage": "node --use-system-ca scripts/subir-archivos-seed.mjs",
+    "sb": "node scripts/sb.mjs",
+    "db:push": "node scripts/sb.mjs db push --yes",
+    "db:seed": "node scripts/sb.mjs db push --include-seed --yes",
+    "db:sql": "node --use-system-ca scripts/migrar.mjs --sql",
+    "db:push:https": "node --use-system-ca scripts/migrar.mjs",
+    "db:seed:https": "node --use-system-ca scripts/migrar.mjs --seed"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
+    "next": "^16.3.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "supabase": "^2.119.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~5.9.3"
+  }
+}
