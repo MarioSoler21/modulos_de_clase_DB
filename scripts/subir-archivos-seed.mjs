@@ -21,7 +21,7 @@ function crearPdf(titulo, texto) {
   const contenido =
     `BT /F1 22 Tf 72 720 Td (${esc(titulo)}) Tj ET\n` +
     `BT /F1 12 Tf 72 690 Td (${esc(texto)}) Tj ET\n` +
-    `BT /F1 10 Tf 72 670 Td (Colegio Don Bosco - material de ejemplo) Tj ET`;
+    `BT /F1 10 Tf 72 670 Td (Instituto Don Bosco - San Pedro Sula - material de ejemplo) Tj ET`;
   const objetos = [
     "<< /Type /Catalog /Pages 2 0 R >>",
     "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
@@ -52,6 +52,42 @@ const ARCHIVOS = [
     path: "seed/lectura-la-celula.pdf",
     titulo: "Lectura: partes de la celula",
     texto: "Membrana, citoplasma y nucleo. Compara la celula animal con la vegetal.",
+  },
+  // El texto va sin tildes: la fuente base de PDF (Helvetica) no las codifica bien.
+  {
+    path: "seed/matematicas-algebra.pdf",
+    titulo: "Guia: lenguaje algebraico",
+    texto: "Traduce al lenguaje algebraico: el doble de un numero, un numero aumentado en 5...",
+  },
+  {
+    path: "seed/espanol-lectura.pdf",
+    titulo: "Lectura: El Sombreron (leyenda hondurena)",
+    texto: "Lee la leyenda con atencion y subraya la idea principal de cada parrafo.",
+  },
+  {
+    path: "seed/espanol-acentuacion.pdf",
+    titulo: "Reglas de acentuacion",
+    texto: "Agudas: tilde si terminan en n, s o vocal. Graves: tilde si no. Esdrujulas: siempre.",
+  },
+  {
+    path: "seed/ingles-vocabulario.pdf",
+    titulo: "Vocabulary list: greetings",
+    texto: "Hello, Good morning, Good afternoon, Nice to meet you, How are you?, See you later.",
+  },
+  {
+    path: "seed/literatura-generos.pdf",
+    titulo: "Generos literarios",
+    texto: "Narrativo (cuento, novela), lirico (poema) y dramatico (teatro): compara sus rasgos.",
+  },
+  {
+    path: "seed/computacion-partes.pdf",
+    titulo: "Guia: partes de la computadora",
+    texto: "Entrada: teclado, mouse. Salida: monitor, impresora. Almacenamiento: disco, memoria USB.",
+  },
+  {
+    path: "seed/sociales-departamentos.pdf",
+    titulo: "Los 18 departamentos de Honduras",
+    texto: "Ubica cada departamento y su cabecera. San Pedro Sula esta en el departamento de Cortes.",
   },
 ];
 

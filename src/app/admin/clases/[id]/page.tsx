@@ -1,9 +1,12 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Pencil, Trash2, Users } from "lucide-react";
+import CabeceraClase from "@/components/CabeceraClase";
+import CamposClase from "@/components/CamposClase";
 import FormAccion from "@/components/FormAccion";
+import { Avatar, Tarjeta, TituloSeccion, Volver } from "@/components/ui";
 import { alumnosDeClase, claseDeUsuario } from "@/lib/acceso";
-import { ListaGrados, gradosConocidos, listarUsuarios } from "@/lib/admin";
-import { ESTILO_BOTON_PELIGRO, ESTILO_BOTON_SECUNDARIO, ESTILO_INPUT } from "@/lib/formulario";
+import { gradosConocidos, listarUsuarios } from "@/lib/admin";
+import { ESTILO_BOTON_PELIGRO, ESTILO_BOTON_SECUNDARIO, ESTILO_BOTON_VERDE, ESTILO_ETIQUETA, ESTILO_INPUT } from "@/lib/formulario";
 import { requerirRol } from "@/lib/sesion";
 import { borrarClase, editarClase, inscribirAlumno, inscribirGrado, quitarAlumno } from "../../actions";
 
@@ -24,109 +27,99 @@ export default async function AdminClasePage({ params }: { params: Promise<{ id:
   const disponibles = estudiantes
     .filter((e) => !yaInscritos.has(e.usuario))
     .sort((a, b) => Number(b.grado === clase.grado) - Number(a.grado === clase.grado) || a.nombre.localeCompare(b.nombre));
+  const maestro = maestros.find((m) => m.usuario === clase.maestro_usuario);
 
   return (
     <>
-      <Link href="/admin/clases" className="mb-4 inline-block text-sm text-blue-700 hover:underline">
-        Volver a clases
-      </Link>
-      <h1 className="mb-6 text-2xl font-semibold">
-        {clase.nombre} <span className="font-normal text-slate-500">- {clase.grado}</span>
-      </h1>
+      <Volver href="/admin/clases" texto="Clases" />
+      <CabeceraClase clase={clase} maestro={maestro?.nombre ?? null}>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 ring-1 ring-white/20">
+          <Users className="h-4 w-4" /> {inscritos.length} alumnos
+        </span>
+      </CabeceraClase>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
-        <section className="h-fit rounded-lg border border-slate-200 bg-white p-4">
-          <h2 className="mb-3 font-semibold">Datos de la clase</h2>
-          <FormAccion accion={editarClase.bind(null, clase.id)} boton="Guardar cambios">
-            <label className="block">
-              <span className="text-sm font-medium">Nombre</span>
-              <input name="nombre" required maxLength={120} defaultValue={clase.nombre} className={ESTILO_INPUT} />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">Grado</span>
-              <input name="grado" required maxLength={40} list="grados" defaultValue={clase.grado} className={ESTILO_INPUT} />
-              <ListaGrados id="grados" grados={grados} />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">Maestro</span>
-              <select name="maestro_usuario" defaultValue={clase.maestro_usuario ?? ""} className={ESTILO_INPUT}>
-                <option value="">Sin asignar</option>
-                {maestros.map((m) => (
-                  <option key={m.usuario} value={m.usuario}>
-                    {m.nombre}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </FormAccion>
-
-          <div className="mt-6 border-t border-slate-100 pt-4">
+      <div className="space-y-6">
+        <Tarjeta className="p-5">
+          <TituloSeccion icono={Users}>Alumnos inscritos ({inscritos.length})</TituloSeccion>
+          <div className="mb-4 flex flex-wrap items-end gap-3 rounded-xl bg-slate-50 p-3">
             <FormAccion
-              accion={borrarClase.bind(null, clase.id)}
-              boton="Borrar clase"
-              enviando="Borrando..."
-              estiloBoton={ESTILO_BOTON_PELIGRO}
-              confirmar={`Se borrara "${clase.nombre}" con todos sus modulos, recursos y archivos. No se puede deshacer.`}
+              accion={inscribirAlumno.bind(null, clase.id)}
+              boton="Inscribir"
+              enviando="Inscribiendo..."
+              estiloBoton={ESTILO_BOTON_VERDE}
+              className="flex flex-1 flex-wrap items-end gap-3"
+            >
+              <label className="block min-w-60 flex-1">
+                <span className={ESTILO_ETIQUETA}>Agregar alumno</span>
+                <select name="estudiante_usuario" required defaultValue="" className={ESTILO_INPUT}>
+                  <option value="" disabled>
+                    {disponibles.length ? "Selecciona un alumno" : "No hay alumnos disponibles"}
+                  </option>
+                  {disponibles.map((e) => (
+                    <option key={e.usuario} value={e.usuario}>
+                      {e.nombre} ({e.grado})
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </FormAccion>
+            <FormAccion
+              accion={inscribirGrado.bind(null, clase.id)}
+              boton={`Inscribir a todo ${clase.grado}`}
+              enviando="Inscribiendo..."
+              estiloBoton={ESTILO_BOTON_SECUNDARIO}
+              className=""
             />
           </div>
-        </section>
-
-        <section className="rounded-lg border border-slate-200 bg-white p-4">
-          <h2 className="mb-3 font-semibold">Alumnos inscritos ({inscritos.length})</h2>
-
-          <FormAccion
-            accion={inscribirAlumno.bind(null, clase.id)}
-            boton="Inscribir"
-            enviando="Inscribiendo..."
-            className="mb-3 flex flex-wrap items-end gap-3"
-          >
-            <label className="block min-w-56 flex-1">
-              <span className="text-sm font-medium">Agregar alumno</span>
-              <select name="estudiante_usuario" required defaultValue="" className={ESTILO_INPUT}>
-                <option value="" disabled>
-                  {disponibles.length ? "Selecciona un alumno" : "No hay alumnos disponibles"}
-                </option>
-                {disponibles.map((e) => (
-                  <option key={e.usuario} value={e.usuario}>
-                    {e.nombre} ({e.grado})
-                  </option>
-                ))}
-              </select>
-            </label>
-          </FormAccion>
-
-          <FormAccion
-            accion={inscribirGrado.bind(null, clase.id)}
-            boton={`Inscribir a todo ${clase.grado}`}
-            enviando="Inscribiendo..."
-            estiloBoton={ESTILO_BOTON_SECUNDARIO}
-            className="mb-4"
-          />
 
           {inscritos.length === 0 ? (
-            <p className="text-sm text-slate-500">Todavia no hay alumnos inscritos.</p>
+            <p className="text-sm text-slate-500">Todavía no hay alumnos inscritos.</p>
           ) : (
-            <ul className="divide-y divide-slate-100 text-sm">
+            <ul className="grid gap-2 sm:grid-cols-2">
               {inscritos.map((a) => (
-                <li key={a.usuario} className="flex items-center justify-between gap-3 py-2">
-                  <span>
-                    {a.nombre} <span className="text-slate-400">- {a.usuario}</span>
+                <li key={a.usuario} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 px-3 py-2">
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <Avatar nombre={a.nombre} tamano="sm" />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-semibold">{a.nombre}</span>
+                      <span className={`block text-xs ${a.grado === clase.grado ? "text-slate-400" : "text-amber-700"}`}>
+                        {a.usuario} - {a.grado}
+                      </span>
+                    </span>
                   </span>
-                  <span className="flex items-center gap-3">
-                    <span className={a.grado === clase.grado ? "text-slate-500" : "text-amber-700"}>{a.grado}</span>
-                    <FormAccion
-                      accion={quitarAlumno.bind(null, clase.id, a.usuario)}
-                      boton="Quitar"
-                      enviando="..."
-                      estiloBoton={ESTILO_BOTON_SECUNDARIO}
-                      className=""
-                    />
-                  </span>
+                  <FormAccion
+                    accion={quitarAlumno.bind(null, clase.id, a.usuario)}
+                    boton="Quitar"
+                    enviando="..."
+                    estiloBoton={ESTILO_BOTON_SECUNDARIO}
+                    className=""
+                  />
                 </li>
               ))}
             </ul>
           )}
-        </section>
+        </Tarjeta>
+
+        <Tarjeta className="p-5">
+          <TituloSeccion icono={Pencil}>Datos de la clase</TituloSeccion>
+          <FormAccion accion={editarClase.bind(null, clase.id)} boton="Guardar cambios">
+            <CamposClase clase={clase} maestros={maestros} grados={grados} />
+          </FormAccion>
+        </Tarjeta>
+
+        <Tarjeta className="border-red-100 p-5">
+          <TituloSeccion icono={Trash2}>Zona de riesgo</TituloSeccion>
+          <p className="mb-3 text-sm text-slate-500">
+            Borrar la clase elimina sus módulos, recursos, tareas, entregas y archivos. No se puede deshacer.
+          </p>
+          <FormAccion
+            accion={borrarClase.bind(null, clase.id)}
+            boton="Borrar clase"
+            enviando="Borrando..."
+            estiloBoton={ESTILO_BOTON_PELIGRO}
+            confirmar={`Se borrará "${clase.nombre}" (${clase.grado}) con todos sus módulos, recursos, tareas y archivos. No se puede deshacer.`}
+          />
+        </Tarjeta>
       </div>
     </>
   );

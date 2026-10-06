@@ -2,10 +2,24 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { crearModulo, type EstadoForm } from "@/app/maestro/clase/[id]/actions";
+import { ESTILO_BOTON, ESTILO_ETIQUETA, ESTILO_INPUT } from "@/lib/formulario";
 
-const ESTILO_INPUT = "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-600";
+export interface OpcionSemana {
+  id: string;
+  etiqueta: string;
+}
 
-export default function FormModulo({ claseId, siguienteOrden }: { claseId: string; siguienteOrden: number }) {
+export default function FormModulo({
+  claseId,
+  siguienteOrden,
+  semanas,
+  semanaPorDefecto,
+}: {
+  claseId: string;
+  siguienteOrden: number;
+  semanas: OpcionSemana[];
+  semanaPorDefecto: string;
+}) {
   const [estado, accion, enviando] = useActionState<EstadoForm, FormData>(crearModulo.bind(null, claseId), {});
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -15,13 +29,24 @@ export default function FormModulo({ claseId, siguienteOrden }: { claseId: strin
 
   return (
     <form ref={formRef} action={accion} className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-[1fr_6rem]">
+      <label className="block">
+        <span className={ESTILO_ETIQUETA}>Título</span>
+        <input name="titulo" required maxLength={200} className={ESTILO_INPUT} />
+      </label>
+      <div className="grid grid-cols-[1fr_5.5rem] gap-3">
         <label className="block">
-          <span className="text-sm font-medium">Titulo</span>
-          <input name="titulo" required maxLength={200} className={ESTILO_INPUT} />
+          <span className={ESTILO_ETIQUETA}>Semana</span>
+          <select key={semanaPorDefecto} name="semana_id" defaultValue={semanaPorDefecto} className={ESTILO_INPUT}>
+            <option value="">Sin semana</option>
+            {semanas.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.etiqueta}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="block">
-          <span className="text-sm font-medium">Orden</span>
+          <span className={ESTILO_ETIQUETA}>Orden</span>
           <input
             key={siguienteOrden}
             name="orden"
@@ -34,7 +59,7 @@ export default function FormModulo({ claseId, siguienteOrden }: { claseId: strin
         </label>
       </div>
       <label className="block">
-        <span className="text-sm font-medium">Descripcion</span>
+        <span className={ESTILO_ETIQUETA}>Descripción</span>
         <textarea name="descripcion" rows={2} maxLength={1000} className={ESTILO_INPUT} />
       </label>
       <label className="flex items-center gap-2 text-sm">
@@ -42,12 +67,8 @@ export default function FormModulo({ claseId, siguienteOrden }: { claseId: strin
         Publicado (visible para estudiantes)
       </label>
       {estado.error && <p className="text-sm text-red-600">{estado.error}</p>}
-      <button
-        type="submit"
-        disabled={enviando}
-        className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 disabled:opacity-60"
-      >
-        {enviando ? "Creando..." : "Crear modulo"}
+      <button type="submit" disabled={enviando} className={ESTILO_BOTON}>
+        {enviando ? "Creando..." : "Crear módulo"}
       </button>
     </form>
   );

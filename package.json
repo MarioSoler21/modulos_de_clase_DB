@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node --use-system-ca node_modules/next/dist/bin/next dev",
-    "build": "next build",
-    "start": "node --use-system-ca node_modules/next/dist/bin/next start",
+    "dev": "node scripts/next.mjs dev",
+    "build": "node scripts/next.mjs build",
+    "start": "node scripts/next.mjs start",
     "seed:storage": "node --use-system-ca scripts/subir-archivos-seed.mjs",
     "sb": "node scripts/sb.mjs",
     "db:push": "node scripts/sb.mjs db push --yes",
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
+    "lucide-react": "^1.52.0",
     "next": "^16.3.8",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

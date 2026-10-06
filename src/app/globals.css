@@ -1,5 +1,89 @@
 @import "tailwindcss";
 
+/*
+  Identidad del Instituto Don Bosco (San Pedro Sula, Honduras).
+  Colores tomados del logo: azul #003E93 y verde #015E28.
+  "marca" es el azul y "bosque" el verde. Las escalas blue y green de Tailwind se
+  reemplazan por las mismas para que todo el sitio use los colores institucionales.
+*/
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  --color-marca-50: #eef4ff;
+  --color-marca-100: #dbe6fe;
+  --color-marca-200: #bfd2fb;
+  --color-marca-300: #93b3f5;
+  --color-marca-400: #5f88ea;
+  --color-marca-500: #3563d6;
+  --color-marca-600: #1a49b8;
+  --color-marca-700: #003e93;
+  --color-marca-800: #03347a;
+  --color-marca-900: #072c62;
+  --color-marca-950: #051c40;
+
+  --color-bosque-50: #eefbf2;
+  --color-bosque-100: #d6f5df;
+  --color-bosque-200: #b0eac3;
+  --color-bosque-300: #7bd89e;
+  --color-bosque-400: #43bd73;
+  --color-bosque-500: #1f9f53;
+  --color-bosque-600: #128041;
+  --color-bosque-700: #015e28;
+  --color-bosque-800: #0a4d25;
+  --color-bosque-900: #0a3f20;
+  --color-bosque-950: #032412;
+
+  --color-blue-50: var(--color-marca-50);
+  --color-blue-100: var(--color-marca-100);
+  --color-blue-200: var(--color-marca-200);
+  --color-blue-300: var(--color-marca-300);
+  --color-blue-400: var(--color-marca-400);
+  --color-blue-500: var(--color-marca-500);
+  --color-blue-600: var(--color-marca-600);
+  --color-blue-700: var(--color-marca-700);
+  --color-blue-800: var(--color-marca-800);
+  --color-blue-900: var(--color-marca-900);
+
+  --color-green-50: var(--color-bosque-50);
+  --color-green-100: var(--color-bosque-100);
+  --color-green-200: var(--color-bosque-200);
+  --color-green-300: var(--color-bosque-300);
+  --color-green-400: var(--color-bosque-400);
+  --color-green-500: var(--color-bosque-500);
+  --color-green-600: var(--color-bosque-600);
+  --color-green-700: var(--color-bosque-700);
+  --color-green-800: var(--color-bosque-800);
+  --color-green-900: var(--color-bosque-900);
+
+  --shadow-tarjeta: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px -4px rgb(15 23 42 / 0.08);
+  --shadow-elevada: 0 2px 4px rgb(15 23 42 / 0.05), 0 12px 32px -8px rgb(0 62 147 / 0.22);
+}
+
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+/* Franja institucional azul y verde bajo el encabezado. */
+.franja-institucional {
+  background: linear-gradient(90deg, var(--color-marca-700) 0 50%, var(--color-bosque-700) 50% 100%);
+}
+
+/* Fondo de marca para el login y las cabeceras grandes. */
+.fondo-marca {
+  background:
+    radial-gradient(1200px 500px at 0% 0%, rgb(255 255 255 / 0.08), transparent 60%),
+    linear-gradient(135deg, var(--color-marca-800) 0%, var(--color-marca-700) 45%, var(--color-bosque-700) 100%);
+}
+
+/* Patron sutil de puntos para fondos de marca. */
+.patron-puntos {
+  background-image: radial-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
 }

@@ -28,6 +28,41 @@ export const EXTENSIONES: Partial<Record<TipoRecurso, Record<string, string>>> =
   imagen: { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp" },
 };
 
+// Detecta el tipo de documento por la extension del archivo (para subida multiple).
+export function tipoPorExtension(nombre: string): TipoRecurso | null {
+  const ext = extension(nombre);
+  for (const [tipo, exts] of Object.entries(EXTENSIONES)) {
+    if (exts && ext in exts) return tipo as TipoRecurso;
+  }
+  return null;
+}
+
+export function contentTypeDe(nombre: string): string | null {
+  const tipo = tipoPorExtension(nombre);
+  return tipo ? (EXTENSIONES[tipo]?.[extension(nombre)] ?? null) : null;
+}
+
+// Todas las extensiones de documento aceptadas (para entregas de tareas).
+export const ACCEPT_DOCUMENTOS = Object.values(EXTENSIONES)
+  .flatMap((m) => Object.keys(m ?? {}))
+  .map((e) => "." + e)
+  .join(",");
+
+export function tituloDesdeArchivo(nombre: string): string {
+  return nombre.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim() || nombre;
+}
+
+export function nombreSeguro(nombre: string): string {
+  return (
+    nombre
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-zA-Z0-9._-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(-80) || "archivo"
+  );
+}
+
 export function esDocumento(tipo: TipoRecurso): boolean {
   return tipo in EXTENSIONES;
 }

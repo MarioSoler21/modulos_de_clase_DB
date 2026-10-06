@@ -8,10 +8,13 @@ export interface EstadoForm {
 export type AccionForm = (prev: EstadoForm, form: FormData) => Promise<EstadoForm>;
 
 export const ESTILO_INPUT =
-  "mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-600";
+  "mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition placeholder:text-slate-400 focus:border-marca-600 focus:ring-4 focus:ring-marca-100";
 export const ESTILO_BOTON =
-  "rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 disabled:opacity-60";
+  "inline-flex items-center justify-center gap-2 rounded-xl bg-marca-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-marca-800 focus:outline-none focus:ring-4 focus:ring-marca-200 disabled:opacity-60";
+export const ESTILO_BOTON_VERDE =
+  "inline-flex items-center justify-center gap-2 rounded-xl bg-bosque-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-bosque-800 focus:outline-none focus:ring-4 focus:ring-bosque-200 disabled:opacity-60";
 export const ESTILO_BOTON_SECUNDARIO =
-  "rounded-md border border-slate-300 px-3 py-1 text-sm hover:bg-slate-100 disabled:opacity-60";
+  "inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 disabled:opacity-60";
 export const ESTILO_BOTON_PELIGRO =
-  "rounded-md border border-red-300 px-3 py-1 text-sm text-red-700 hover:bg-red-50 disabled:opacity-60";
+  "inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60";
+export const ESTILO_ETIQUETA = "text-sm font-semibold text-slate-700";

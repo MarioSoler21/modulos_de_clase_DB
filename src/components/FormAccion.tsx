@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import { CircleAlert, CircleCheck } from "lucide-react";
 import { ESTILO_BOTON, type AccionForm, type EstadoForm } from "@/lib/formulario";
 
 // Formulario generico para server actions: muestra error o mensaje y opcionalmente
@@ -45,8 +46,18 @@ export default function FormAccion({
         <button type="submit" disabled={pendiente} className={estiloBoton}>
           {pendiente ? textoEnviando : boton}
         </button>
-        {estado.error && <p className="text-sm text-red-600">{estado.error}</p>}
-        {!estado.error && estado.mensaje && <p className="text-sm text-green-700">{estado.mensaje}</p>}
+        {estado.error && (
+          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600">
+            <CircleAlert className="h-4 w-4 shrink-0" />
+            {estado.error}
+          </p>
+        )}
+        {!estado.error && estado.mensaje && (
+          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-bosque-700">
+            <CircleCheck className="h-4 w-4 shrink-0" />
+            {estado.mensaje}
+          </p>
+        )}
       </div>
     </form>
   );

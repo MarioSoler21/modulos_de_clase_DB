@@ -1,24 +1,27 @@
 import Link from "next/link";
+import { ChevronRight, Clock, Plus, School, UserRound, Users } from "lucide-react";
+import CamposClase from "@/components/CamposClase";
 import FormAccion from "@/components/FormAccion";
-import { ListaGrados, gradosConocidos, listarUsuarios } from "@/lib/admin";
-import { ESTILO_INPUT } from "@/lib/formulario";
+import { Tarjeta, TituloPagina, TituloSeccion, Vacio } from "@/components/ui";
+import { gradosConocidos, listarUsuarios } from "@/lib/admin";
+import { estiloClase } from "@/lib/materias";
 import { supabaseServer } from "@/lib/supabase/server";
+import type { Clase } from "@/lib/tipos";
 import { crearClase } from "../actions";
 
-interface FilaClase {
-  id: string;
-  nombre: string;
-  grado: string;
+export const metadata = { title: "Clases" };
+
+type FilaClase = Clase & {
   maestro: { nombre: string } | null;
   inscripciones: { count: number }[];
   modulos: { count: number }[];
-}
+};
 
 export default async function AdminClasesPage() {
   const [{ data, error }, maestros, grados] = await Promise.all([
     supabaseServer()
       .from("clases")
-      .select("id, nombre, grado, maestro:usuarios!clases_maestro_fk(nombre), inscripciones(count), modulos(count)")
+      .select("*, maestro:usuarios!clases_maestro_fk(nombre), inscripciones(count), modulos(count)")
       .order("grado")
       .order("nombre"),
     listarUsuarios("maestro"),
@@ -26,71 +29,71 @@ export default async function AdminClasesPage() {
   ]);
   if (error) throw new Error(error.message);
   const clases = (data ?? []) as unknown as FilaClase[];
+  const porGrado = [...new Set(clases.map((c) => c.grado))].map((g) => ({
+    grado: g,
+    clases: clases.filter((c) => c.grado === g),
+  }));
 
   return (
     <>
-      <h1 className="mb-4 text-2xl font-semibold">Clases</h1>
+      <TituloPagina icono={School} titulo="Clases" subtitulo={`${clases.length} clases en ${porGrado.length} grados`} />
 
-      <section className="mb-8 rounded-lg border border-slate-200 bg-white p-4">
-        <h2 className="mb-3 font-semibold">Nueva clase</h2>
+      <Tarjeta className="mb-8 p-5">
+        <TituloSeccion icono={Plus}>Nueva clase</TituloSeccion>
         <FormAccion accion={crearClase} boton="Crear clase" enviando="Creando...">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <label className="block">
-              <span className="text-sm font-medium">Nombre</span>
-              <input name="nombre" required maxLength={120} placeholder="Ej. Lenguaje" className={ESTILO_INPUT} />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">Grado</span>
-              <input name="grado" required maxLength={40} list="grados" placeholder="Ej. 7mo A" className={ESTILO_INPUT} />
-              <ListaGrados id="grados" grados={grados} />
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium">Maestro</span>
-              <select name="maestro_usuario" defaultValue="" className={ESTILO_INPUT}>
-                <option value="">Sin asignar</option>
-                {maestros.map((m) => (
-                  <option key={m.usuario} value={m.usuario}>
-                    {m.nombre}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <CamposClase maestros={maestros} grados={grados} />
         </FormAccion>
-      </section>
+      </Tarjeta>
 
       {clases.length === 0 ? (
-        <p className="rounded-md border border-dashed border-slate-300 p-6 text-slate-500">No hay clases todavia.</p>
+        <Vacio icono={School}>No hay clases todavía.</Vacio>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
-              <tr>
-                <th className="px-4 py-2 font-medium">Clase</th>
-                <th className="px-4 py-2 font-medium">Grado</th>
-                <th className="px-4 py-2 font-medium">Maestro</th>
-                <th className="px-4 py-2 text-right font-medium">Alumnos</th>
-                <th className="px-4 py-2 text-right font-medium">Modulos</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {clases.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-2">
-                    <Link href={`/admin/clases/${c.id}`} className="font-medium text-blue-700 hover:underline">
-                      {c.nombre}
+        <div className="space-y-8">
+          {porGrado.map(({ grado, clases }) => (
+            <section key={grado}>
+              <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+                <span className="rounded-lg bg-marca-700 px-2.5 py-0.5 text-sm text-white">{grado}</span>
+                <span className="text-sm font-medium text-slate-500">{clases.length} clases</span>
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {clases.map((c) => {
+                  const { Icono, suave, texto } = estiloClase(c);
+                  return (
+                    <Link
+                      key={c.id}
+                      href={`/admin/clases/${c.id}`}
+                      className="group flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-tarjeta transition hover:-translate-y-0.5 hover:shadow-elevada"
+                    >
+                      <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${suave} ${texto}`}>
+                        <Icono className="h-5 w-5" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-bold text-slate-900">{c.nombre}</span>
+                        <span
+                          className={`mt-0.5 flex items-center gap-1 text-sm ${c.maestro ? "text-slate-600" : "font-semibold text-amber-700"}`}
+                        >
+                          <UserRound className="h-3.5 w-3.5" />
+                          {c.maestro?.nombre ?? "Sin maestro"}
+                        </span>
+                        <span className="mt-1 flex flex-wrap gap-x-3 text-xs text-slate-500">
+                          <span className="inline-flex items-center gap-1">
+                            <Users className="h-3.5 w-3.5" /> {c.inscripciones[0]?.count ?? 0} alumnos
+                          </span>
+                          <span>{c.modulos[0]?.count ?? 0} módulos</span>
+                          {c.horario && (
+                            <span className="inline-flex items-center gap-1">
+                              <Clock className="h-3.5 w-3.5" /> {c.horario}
+                            </span>
+                          )}
+                        </span>
+                      </span>
+                      <ChevronRight className="mt-1 h-4 w-4 text-slate-300 transition group-hover:text-marca-700" />
                     </Link>
-                  </td>
-                  <td className="px-4 py-2">{c.grado}</td>
-                  <td className="px-4 py-2">
-                    {c.maestro?.nombre ?? <span className="text-amber-700">Sin asignar</span>}
-                  </td>
-                  <td className="px-4 py-2 text-right">{c.inscripciones[0]?.count ?? 0}</td>
-                  <td className="px-4 py-2 text-right">{c.modulos[0]?.count ?? 0}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </div>
       )}
     </>

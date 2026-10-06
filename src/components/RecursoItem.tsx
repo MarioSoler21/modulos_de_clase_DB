@@ -1,34 +1,50 @@
+import {
+  ExternalLink,
+  FileSpreadsheet,
+  FileText,
+  FileType2,
+  ImageIcon,
+  Link2,
+  Megaphone,
+  PlayCircle,
+  type LucideIcon,
+} from "lucide-react";
 import { ETIQUETA_TIPO, esDocumento, urlEmbed } from "@/lib/recursos";
-import type { Recurso } from "@/lib/tipos";
+import type { Recurso, TipoRecurso } from "@/lib/tipos";
 
-const COLOR_TIPO: Record<string, string> = {
-  pdf: "bg-red-50 text-red-700",
-  doc: "bg-blue-50 text-blue-700",
-  excel: "bg-green-50 text-green-700",
-  imagen: "bg-purple-50 text-purple-700",
-  video: "bg-orange-50 text-orange-700",
-  enlace: "bg-slate-100 text-slate-700",
-  anuncio: "bg-yellow-50 text-yellow-800",
+const ESTILO_TIPO: Record<TipoRecurso, { Icono: LucideIcon; clase: string }> = {
+  pdf: { Icono: FileText, clase: "bg-red-50 text-red-600" },
+  doc: { Icono: FileType2, clase: "bg-marca-50 text-marca-700" },
+  excel: { Icono: FileSpreadsheet, clase: "bg-bosque-50 text-bosque-700" },
+  imagen: { Icono: ImageIcon, clase: "bg-violet-50 text-violet-700" },
+  video: { Icono: PlayCircle, clase: "bg-orange-50 text-orange-600" },
+  enlace: { Icono: Link2, clase: "bg-sky-50 text-sky-700" },
+  anuncio: { Icono: Megaphone, clase: "bg-amber-100 text-amber-700" },
 };
 
-function Etiqueta({ tipo }: { tipo: Recurso["tipo"] }) {
+function IconoTipo({ tipo }: { tipo: TipoRecurso }) {
+  const { Icono, clase } = ESTILO_TIPO[tipo];
   return (
-    <span className={`shrink-0 rounded px-2 py-0.5 text-xs font-medium ${COLOR_TIPO[tipo]}`}>
-      {ETIQUETA_TIPO[tipo]}
+    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${clase}`}>
+      <Icono className="h-5 w-5" />
     </span>
   );
 }
 
-const ESTILO_BOTON = "shrink-0 rounded-md border border-slate-300 px-3 py-1 text-sm hover:bg-slate-100";
+const ESTILO_BOTON =
+  "inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-marca-300 hover:text-marca-700";
 
 export default function RecursoItem({ recurso }: { recurso: Recurso }) {
   const r = recurso;
 
   if (r.tipo === "anuncio") {
     return (
-      <div className="flex items-start gap-3 rounded-md border border-yellow-200 bg-yellow-50 p-3">
-        <Etiqueta tipo={r.tipo} />
-        <p className="whitespace-pre-line text-sm">{r.titulo}</p>
+      <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 p-3">
+        <IconoTipo tipo="anuncio" />
+        <div className="min-w-0">
+          <p className="text-xs font-bold uppercase tracking-wide text-amber-700">Anuncio</p>
+          <p className="whitespace-pre-line text-sm font-medium text-slate-800">{r.titulo}</p>
+        </div>
       </div>
     );
   }
@@ -36,13 +52,16 @@ export default function RecursoItem({ recurso }: { recurso: Recurso }) {
   if (r.tipo === "video" && r.video_url) {
     const embed = urlEmbed(r.video_url);
     return (
-      <div className="rounded-md border border-slate-200 p-3">
-        <div className="mb-2 flex items-center gap-3">
-          <Etiqueta tipo={r.tipo} />
-          <span className="text-sm font-medium">{r.titulo}</span>
+      <div className="rounded-2xl border border-slate-200 p-3">
+        <div className="mb-3 flex items-center gap-3">
+          <IconoTipo tipo="video" />
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-wide text-orange-600">Video</p>
+            <p className="truncate text-sm font-semibold text-slate-800">{r.titulo}</p>
+          </div>
         </div>
         {embed ? (
-          <div className="aspect-video w-full overflow-hidden rounded bg-black">
+          <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
             <iframe
               src={embed}
               title={r.titulo}
@@ -53,8 +72,8 @@ export default function RecursoItem({ recurso }: { recurso: Recurso }) {
             />
           </div>
         ) : (
-          <a href={r.video_url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-700 underline">
-            Ver video en el sitio original
+          <a href={r.video_url} target="_blank" rel="noopener noreferrer" className={ESTILO_BOTON}>
+            <ExternalLink className="h-4 w-4" /> Ver video en el sitio original
           </a>
         )}
       </div>
@@ -62,9 +81,12 @@ export default function RecursoItem({ recurso }: { recurso: Recurso }) {
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-md border border-slate-200 p-3">
-      <Etiqueta tipo={r.tipo} />
-      <span className="min-w-0 flex-1 truncate text-sm font-medium">{r.titulo}</span>
+    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 p-3 transition hover:border-slate-300">
+      <IconoTipo tipo={r.tipo} />
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{ETIQUETA_TIPO[r.tipo]}</p>
+        <p className="truncate text-sm font-semibold text-slate-800">{r.titulo}</p>
+      </div>
       {esDocumento(r.tipo) && (
         <a href={`/api/signed-url?recurso=${r.id}`} target="_blank" rel="noopener" className={ESTILO_BOTON}>
           Abrir
@@ -72,7 +94,7 @@ export default function RecursoItem({ recurso }: { recurso: Recurso }) {
       )}
       {r.tipo === "enlace" && r.video_url && (
         <a href={r.video_url} target="_blank" rel="noopener noreferrer" className={ESTILO_BOTON}>
-          Ir al enlace
+          <ExternalLink className="h-4 w-4" /> Ir al enlace
         </a>
       )}
     </div>
